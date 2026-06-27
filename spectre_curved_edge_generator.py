@@ -9,6 +9,23 @@ import matplotlib.pyplot as plt
 # and in particular for Python content: https://github.com/shrx/spectre/issues/1
 
 
+# Eliminate string processing overhead -- use numerical constants instead
+# This eliminates a source for typographical errors
+# No change in execution speed
+class TileNames:
+    Gamma = 1
+    Gamma1 = 1
+    Gamma2 = 3
+    Delta = 4
+    Theta = 5
+    Lambda = 6
+    Xi = 7
+    Pi = 8
+    Sigma = 9
+    Phi = 10
+    Psi = 11
+
+
 class Spectre:
 
     # general-purpose linear interpolation function
@@ -26,33 +43,34 @@ class Spectre:
 
     IDENTITY = np.array([[1, 0, 0], [0, 1, 0]], "float32")
 
+    # this list of tile names intentionally omits Gamma1 and Gamma2
     TILE_NAMES = [
-        "Gamma",
-        "Delta",
-        "Theta",
-        "Lambda",
-        "Xi",
-        "Pi",
-        "Sigma",
-        "Phi",
-        "Psi",
+        TileNames.Gamma,
+        TileNames.Delta,
+        TileNames.Theta,
+        TileNames.Lambda,
+        TileNames.Xi,
+        TileNames.Pi,
+        TileNames.Sigma,
+        TileNames.Phi,
+        TileNames.Psi,
     ]
 
     COLOR_MAP = {
-        "Gamma": np.array((211, 95, 95), "f") / 255.0,
-        "Gamma1": np.array((200, 55, 55), "f") / 255.0,
-        "Gamma2": np.array((222, 135, 135), "f") / 255.0,
-        "Delta": np.array((255, 179, 128), "f") / 255.0,
-        "Theta": np.array((0, 255, 255), "f") / 255.0,
-        "Lambda": np.array((128, 128, 128), "f") / 255.0,
-        "Xi": np.array((145, 95, 211), "f") / 255.0,
-        "Pi": np.array((95, 95, 211), "f") / 255.0,
-        "Sigma": np.array((85, 212, 0), "f") / 255.0,
-        "Phi": np.array((255, 170, 238), "f") / 255.0,
-        "Psi": np.array((255, 221, 85), "f") / 255.0,
+        TileNames.Gamma: np.array((211, 95, 95), "f") / 255.0,
+        TileNames.Gamma1: np.array((200, 55, 55), "f") / 255.0,
+        TileNames.Gamma2: np.array((222, 135, 135), "f") / 255.0,
+        TileNames.Delta: np.array((255, 179, 128), "f") / 255.0,
+        TileNames.Theta: np.array((0, 255, 255), "f") / 255.0,
+        TileNames.Lambda: np.array((128, 128, 128), "f") / 255.0,
+        TileNames.Xi: np.array((145, 95, 211), "f") / 255.0,
+        TileNames.Pi: np.array((95, 95, 211), "f") / 255.0,
+        TileNames.Sigma: np.array((85, 212, 0), "f") / 255.0,
+        TileNames.Phi: np.array((255, 170, 238), "f") / 255.0,
+        TileNames.Psi: np.array((255, 221, 85), "f") / 255.0,
     }
 
-    # generate the canonical spectre tile
+    # generate the canonical spectre tile using turtle moves
 
     def generate_spectre_vertices():
         turtle_moves = (
@@ -115,20 +133,20 @@ class Spectre:
         )
         trsf = Spectre.mul(ttrans, trot)
         tiles = {}
-        tiles["Gamma"] = MetaTile(
-            tiles=[Tile("Gamma1"), Tile("Gamma2")],
+        tiles[TileNames.Gamma] = MetaTile(
+            tiles=[Tile(TileNames.Gamma1), Tile(TileNames.Gamma2)],
             transformations=[Spectre.IDENTITY.copy(), trsf],
             quad=Spectre.SPECTRE_QUAD.copy(),
         )
         for label in Spectre.TILE_NAMES:
-            if label != "Gamma":
+            if label != TileNames.Gamma:
                 tiles[label] = Tile(label)
         return tiles
 
     def buildSupertiles(self, input_tiles):
-        # First, use any of the nine-unit tiles in "tiles" to obtain a
+        # First, use any of the nine-unit tiles in TileNames.tiles to obtain a
         # list of transformation matrices for placing tiles within supertiles.
-        quad = input_tiles["Delta"].quad
+        quad = input_tiles[TileNames.Delta].quad
 
         transformations = [Spectre.IDENTITY.copy()]
         total_angle = 0
@@ -170,15 +188,123 @@ class Spectre:
         tiles = {}
 
         for label, substitutions in (
-            ("Gamma", ("Pi", "Delta", None, "Theta", "Sigma", "Xi", "Phi", "Gamma")),
-            ("Delta", ("Xi", "Delta", "Xi", "Phi", "Sigma", "Pi", "Phi", "Gamma")),
-            ("Theta", ("Psi", "Delta", "Pi", "Phi", "Sigma", "Pi", "Phi", "Gamma")),
-            ("Lambda", ("Psi", "Delta", "Xi", "Phi", "Sigma", "Pi", "Phi", "Gamma")),
-            ("Xi", ("Psi", "Delta", "Pi", "Phi", "Sigma", "Psi", "Phi", "Gamma")),
-            ("Pi", ("Psi", "Delta", "Xi", "Phi", "Sigma", "Psi", "Phi", "Gamma")),
-            ("Sigma", ("Xi", "Delta", "Xi", "Phi", "Sigma", "Pi", "Lambda", "Gamma")),
-            ("Phi", ("Psi", "Delta", "Psi", "Phi", "Sigma", "Pi", "Phi", "Gamma")),
-            ("Psi", ("Psi", "Delta", "Psi", "Phi", "Sigma", "Psi", "Phi", "Gamma")),
+            (
+                TileNames.Gamma,
+                (
+                    TileNames.Pi,
+                    TileNames.Delta,
+                    None,
+                    TileNames.Theta,
+                    TileNames.Sigma,
+                    TileNames.Xi,
+                    TileNames.Phi,
+                    TileNames.Gamma,
+                ),
+            ),
+            (
+                TileNames.Delta,
+                (
+                    TileNames.Xi,
+                    TileNames.Delta,
+                    TileNames.Xi,
+                    TileNames.Phi,
+                    TileNames.Sigma,
+                    TileNames.Pi,
+                    TileNames.Phi,
+                    TileNames.Gamma,
+                ),
+            ),
+            (
+                TileNames.Theta,
+                (
+                    TileNames.Psi,
+                    TileNames.Delta,
+                    TileNames.Pi,
+                    TileNames.Phi,
+                    TileNames.Sigma,
+                    TileNames.Pi,
+                    TileNames.Phi,
+                    TileNames.Gamma,
+                ),
+            ),
+            (
+                TileNames.Lambda,
+                (
+                    TileNames.Psi,
+                    TileNames.Delta,
+                    TileNames.Xi,
+                    TileNames.Phi,
+                    TileNames.Sigma,
+                    TileNames.Pi,
+                    TileNames.Phi,
+                    TileNames.Gamma,
+                ),
+            ),
+            (
+                TileNames.Xi,
+                (
+                    TileNames.Psi,
+                    TileNames.Delta,
+                    TileNames.Pi,
+                    TileNames.Phi,
+                    TileNames.Sigma,
+                    TileNames.Psi,
+                    TileNames.Phi,
+                    TileNames.Gamma,
+                ),
+            ),
+            (
+                TileNames.Pi,
+                (
+                    TileNames.Psi,
+                    TileNames.Delta,
+                    TileNames.Xi,
+                    TileNames.Phi,
+                    TileNames.Sigma,
+                    TileNames.Psi,
+                    TileNames.Phi,
+                    TileNames.Gamma,
+                ),
+            ),
+            (
+                TileNames.Sigma,
+                (
+                    TileNames.Xi,
+                    TileNames.Delta,
+                    TileNames.Xi,
+                    TileNames.Phi,
+                    TileNames.Sigma,
+                    TileNames.Pi,
+                    TileNames.Lambda,
+                    TileNames.Gamma,
+                ),
+            ),
+            (
+                TileNames.Phi,
+                (
+                    TileNames.Psi,
+                    TileNames.Delta,
+                    TileNames.Psi,
+                    TileNames.Phi,
+                    TileNames.Sigma,
+                    TileNames.Pi,
+                    TileNames.Phi,
+                    TileNames.Gamma,
+                ),
+            ),
+            (
+                TileNames.Psi,
+                (
+                    TileNames.Psi,
+                    TileNames.Delta,
+                    TileNames.Psi,
+                    TileNames.Phi,
+                    TileNames.Sigma,
+                    TileNames.Psi,
+                    TileNames.Phi,
+                    TileNames.Gamma,
+                ),
+            ),
         ):
             tiles[label] = MetaTile(
                 tiles=[input_tiles[subst] for subst in substitutions if subst],
@@ -199,7 +325,7 @@ class Spectre:
 
         start = time()
         polygons = []
-        tiles["Delta"].draw(polygons)
+        tiles[TileNames.Delta].draw(polygons)
         plt.style.use("dark_background")
         if self.image_w > 0 and self.image_h > 0:
             plt.rcParams["figure.figsize"] = (self.image_w, self.image_h)
@@ -239,17 +365,18 @@ class Spectre:
                 for n in range(self.steps):
                     # create wiggle waveform using sine function
                     arg = Spectre.ntrp(n, 0, self.steps, 0, math.pi * 2)
-                    sw = -math.sin(arg) * radius * amp
-                    # mix orthogonal edge and sinewave components
-                    rr = Spectre.ntrp(n, 0, self.steps, 0, radius)
-                    xx = rr * math.cos(angle) + sw * math.sin(angle)
-                    yy = rr * math.sin(angle) - sw * math.cos(angle)
+                    wave = -math.sin(arg) * radius * amp
+                    base = Spectre.ntrp(n, 0, self.steps, 0, radius)
+                    # join orthogonal base and sinewave components
+                    xx = base * math.cos(angle) + wave * math.sin(angle)
+                    yy = base * math.sin(angle) - wave * math.cos(angle)
                     xs += [xx + xa]
                     ys += [yy + ya]
             xp = xs
             yp = ys
 
-        plt.fill(xp, yp, facecolor=color)  # color)
+        # render solid-color tile
+        plt.fill(xp, yp, facecolor=color)
         # plot dark border around each tile
         plt.plot(xp, yp, color="black", linewidth=0.25)
         # some debugging code
@@ -266,12 +393,9 @@ class Tile:
 
     def draw(self, polygons, tile_transformation=Spectre.IDENTITY.copy()):
         vertices = (
-            # build_default_spectre()
             Spectre.SPECTRE_POINTS.dot(tile_transformation[:, :2].T)
             + tile_transformation[:, 2]
         )
-        # print(vertices)
-        # quit()
         polygons.append((vertices, Spectre.COLOR_MAP[self.label]))
 
 
@@ -298,14 +422,14 @@ class MetaTile:
 # 5         Don't even think about it
 # steps determines the detail of the edge waveforms
 # amplitude controls the depth of the edge waveform curvature
-# 0 = no curvature
+# 0 = no curvature, classic Spectre tile
 # 1 = maximum curvature consistent with interlocking tiles
 # image_w, image_h determine the size of an exported image
 # using matplotlib's image size convention
 
 
 def main():
-    spectre = Spectre(iterations=1, steps=32, amplitude=1, image_w=19.2, image_h=10.8)
+    spectre = Spectre(iterations=2, steps=32, amplitude=1, image_w=19.2, image_h=10.8)
 
     spectre.render()
 
