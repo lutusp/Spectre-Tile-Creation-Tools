@@ -14,6 +14,8 @@ import math, os, sys
 # edge_length (mm): controls the overall
 # size of a tile, which is derived from this length
 
+# stl_height: height in mm for exported STL files
+
 # amplitude: depth of edge waveform, an excessive
 # value may prevent tiles from linking together
 
@@ -33,13 +35,15 @@ class PrintSpectre:
         steps = 32,
         tiles = 8,
         edge_length=12,
+        stl_height = 3,
         amplitude=1.0,
-        shrink_factor=0.25,
+        shrink_factor=0.15,
         data_dir="spectre_tiles",
     ):
         self.steps = steps
         self.tiles = tiles
         self.edge_length = edge_length
+        self.stl_height = stl_height
         self.amplitude = amplitude
         self.shrink_factor = shrink_factor
         self.data_dir = data_dir
@@ -163,13 +167,12 @@ class PrintSpectre:
         xs, ys = self.shrink_perimeter(xp, yp)
 
         # create STL files for each version
-        # "thickness_mm" is the STL tile thickness in mm
-        thickness_mm = 2
+        # the class member "stl_height" is the STL tile thickness in mm
         points = [[x, y] for x, y in zip(xs, ys)]
 
         if True: # create STL files
             # create cadquery object for spectre tile
-            spectre = cq.Workplane("XY").polyline(points).close().extrude(thickness_mm)
+            spectre = cq.Workplane("XY").polyline(points).close().extrude(self.stl_height)
 
             # save the spectre object in STL format
             cq.exporters.export(
@@ -208,13 +211,14 @@ def main():
     # number of versions to create
     tiles = 8
     edge_length = 12 # mm per spectre edge
+    stl_height = 3 # units mm, height of printed part
     amplitude = 1 # depth of wiggles
     # amount of shrinkage to allow
     #  parts to easily fit together
-    shrink_factor = 0.25 # units mm
+    shrink_factor = 0.15 # units mm
     # default spectre edge length mm
     edge_length = 12
-    spectre = PrintSpectre(steps,tiles,edge_length, amplitude, shrink_factor, data_dir)
+    spectre = PrintSpectre(steps,tiles,edge_length, stl_height, amplitude, shrink_factor, data_dir)
     # create the basic spectre data set
     xs, ys = spectre.gen_spectre()
     spectre.spx = xs
