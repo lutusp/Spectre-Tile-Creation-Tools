@@ -11,4 +11,6 @@ The Python scripts are heavily commented, adjusting parameters should be easy. F
 
 See example graphics in the images directory, and STL files with accompanying images in the spectre_tiles directory.
 
+In recent releases, a chirality issue is resolved. In the original code, successive odd/even iteration selections would mirror-flip all the tiles. This would make some saved images inconsistent with printed tiles.
+
 The Spectre tile is a relatively recent creation. It can tile the plane, but without repetition (this is called "aperiodic"). This follows many efforts to create such a tile, beginning with schemes requiring multiple tiles, then a single tile that could tile the plane but had to be flipped over in certain places (a "reflection"), now the Spectre, which does away with that limitation. The Spectre tile is quite an achievement, just in time to be 3D printed.
