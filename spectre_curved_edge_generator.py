@@ -118,8 +118,6 @@ class Spectre:
         self.image_w = image_w
         self.image_h = image_h
 
-    # build_default_spectre()
-
     def buildSpectreBase(self):
         ttrans = np.array(
             [[1, 0, Spectre.SPECTRE_POINTS[8, 0]], [0, 1, Spectre.SPECTRE_POINTS[8, 1]]]
@@ -344,6 +342,13 @@ class Spectre:
     def apply_edge_sine_and_plot(self, nxp, nyp, color):
         xp = nxp.tolist()
         yp = nyp.tolist()
+        # this resolves a chirality issue
+        # with odd/even iteration numbers,
+        # so that all iteration levels
+        # produce the same tile appearance
+        # without mirror-reversing
+        if self.iterations % 2 == 0:
+            xp, yp = yp, xp
         # to close rendered polygons,
         # must wrap these arrays around
         xp += [xp[0]]
@@ -368,8 +373,8 @@ class Spectre:
                     wave = -math.sin(arg) * radius * amp
                     base = Spectre.ntrp(n, 0, self.steps, 0, radius)
                     # join orthogonal base and sinewave components
-                    xx = base * math.cos(angle) + wave * math.sin(angle)
-                    yy = base * math.sin(angle) - wave * math.cos(angle)
+                    xx = base * math.cos(angle) - wave * math.sin(angle)
+                    yy = base * math.sin(angle) + wave * math.cos(angle)
                     xs += [xx + xa]
                     ys += [yy + ya]
             xp = xs
@@ -429,7 +434,8 @@ class MetaTile:
 
 
 def main():
-    spectre = Spectre(iterations=2, steps=32, amplitude=1, image_w=19.2, image_h=10.8)
+    #spectre = Spectre(iterations=3, steps=32, amplitude=0, image_w=19.2, image_h=10.8)
+    spectre = Spectre(iterations=4, steps=32, amplitude=0, image_w=64, image_h=36)
 
     spectre.render()
 
